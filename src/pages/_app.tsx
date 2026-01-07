@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import { AnimatePresence } from "motion/react";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
 
@@ -36,10 +37,12 @@ const univers_cond = localFont({
   display: "swap",
 });
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <div className={`${univers.variable} ${univers_cond.variable} font-sans`}>
-      <Component {...pageProps} />
+      <AnimatePresence mode="wait">
+        <Component key={router.route} {...pageProps} />
+      </AnimatePresence>
     </div>
   );
 }
