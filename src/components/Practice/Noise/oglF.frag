@@ -59,10 +59,10 @@ void main() {
 
     vec2 cellUV = fract(uv);
 
-    float validA = step(0.2, d3) - step(0.4, d3);
-    float validB = step(0.4, d3) - step(0.6, d3);
-    float validC = step(0.6, d3) - step(0.8, d3);
-    float validD = step(0.8, d3);
+    float validA = step(pow(2., -4.), d3) - step(pow(2., -3.), d3);
+    float validB = step(pow(2., -3.), d3) - step(pow(2., -2.), d3);
+    float validC = step(pow(2., -2.), d3) - step(pow(2., -1.), d3);
+    float validD = step(pow(2., -1.), d3);
     
 
     vec3 color = (cell25(cellUV) * targetColor * validA) + (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
