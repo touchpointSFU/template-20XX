@@ -1,4 +1,5 @@
 import "@/styles/globals.css";
+import ReactLenis from "lenis/react";
 import { AnimatePresence } from "motion/react";
 import type { AppProps } from "next/app";
 import localFont from "next/font/local";
@@ -40,6 +41,7 @@ const univers_cond = localFont({
 export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <div className={`${univers.variable} ${univers_cond.variable} font-sans`}>
+      <ReactLenis root />
       <AnimatePresence mode="wait">
         <Component key={router.route} {...pageProps} />
       </AnimatePresence>

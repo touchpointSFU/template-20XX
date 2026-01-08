@@ -10,7 +10,7 @@ export default function Home() {
       exit={{ scale: 0.95, opacity: 0, y: -64 }}
       transition={{ duration: 0.5 }}
       key="home-page"
-      className={`flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
+      className={`flex min-h-[150vh] items-center justify-center bg-zinc-50 font-sans dark:bg-black`}
     >
       <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
         <Image

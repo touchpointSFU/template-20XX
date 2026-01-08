@@ -12,6 +12,6 @@ void main() {
     float valE = step(vUv.y, 1.0 - pow(max(0., abs(vUv.x) * 2. - 1.), sin(uTime -(3.14 / 2.)) * 1.5 + 2.0 ));
 
 
-    vec3 color = vec3(valE);
+    vec3 color = vec3(valD);
     gl_FragColor = vec4(color, 1.0);
 }
