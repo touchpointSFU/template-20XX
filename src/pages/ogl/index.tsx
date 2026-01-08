@@ -49,11 +49,9 @@ export const Page = () => {
 export default Page;
 
 const Test = () => {
-  //   const programRef = useRef<any>(null);
   const { canvas } = useContext(OGLCanvasContext);
-  console.log("canvas", canvas);
+
   const lenis = useLenis((lenis) => {
-    console.log("scroll", lenis.limit);
     mousePositionN.current = [
       (mousePosition.current[0] - bounds.current.left) / bounds.current.width,
       1 -
@@ -108,7 +106,6 @@ const Test = () => {
   };
 
   useLayoutEffect(() => {
-    console.log(bounds);
     window.addEventListener("resize", updateBounds);
     return () => {
       window.removeEventListener("resize", updateBounds);

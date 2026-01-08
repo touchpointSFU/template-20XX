@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
 } from "react";
@@ -39,11 +40,9 @@ export const Page = () => {
 export default Page;
 
 const Test = () => {
-  //   const programRef = useRef<any>(null);
   const { canvas } = useContext(OGLCanvasContext);
-  console.log("canvas", canvas);
+
   const lenis = useLenis((lenis) => {
-    console.log("scroll", lenis.limit);
     mousePositionN.current = [
       (mousePosition.current[0] - bounds.current.left) / bounds.current.width,
       1 -
@@ -60,23 +59,43 @@ const Test = () => {
   //     canvas?.current?.clientHeight || 0,
   //   ]);
 
-  const bounds = useMemo(() => {
-    return {
-      current:
-        canvas && canvas.current
-          ? canvas.current.getBoundingClientRect()
-          : {
-              top: 0,
-              left: 0,
-              width: 0,
-              height: 0,
-            },
-    };
-  }, [canvas]);
+  const bounds = useRef<
+    | DOMRect
+    | {
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+      }
+  >(
+    canvas && canvas.current
+      ? canvas.current.getBoundingClientRect()
+      : {
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+        }
+  );
 
-  useEffect(() => {
-    console.log(bounds);
-  }, [bounds]);
+  const updateBounds = () => {
+    bounds.current =
+      canvas && canvas.current
+        ? canvas.current.getBoundingClientRect()
+        : {
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0,
+          };
+  };
+
+  useLayoutEffect(() => {
+    window.addEventListener("resize", updateBounds);
+    return () => {
+      window.removeEventListener("resize", updateBounds);
+    };
+  }, []);
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
     if (canvas && canvas.current && lenis) {

@@ -25,9 +25,8 @@ float rand( float p ) {
 
 void main() {
     vec2 uv = vUv;
-    // uv *= 10.;
-    // float ratio = uResolution.x / uResolution.y;
-    // vec2 newCoords = vec2(ratio, 1.0);
+    uv *= 10.;
+    vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
     // vec2 toMouse = (uMouse * newCoords - vUv * newCoords);
     // float dist = length(toMouse);
     // float valid = step(0.1, dist);
@@ -35,7 +34,12 @@ void main() {
     // vec3 color = vec3(1. - valid, 1. - valid, 1.);
     // float i = floor(uv.x);
     // float f = fract(uv.x);
-    float d2 = snoise(vec3(uv * ((0.5 + length(uMouse)) * 3.), uTime / 2.)) * 0.5 + 0.5;
-    vec3 color = vec3(d2, 0.0, 0.0);
+
+
+    //Get the gray value from noise
+    float d2 = snoise(vec3(floor(uv), uTime / 4.));
+    d2 = floor(d2 * 10.) / 10.; //Normalize to 0-1
+    vec3 color = vec3(d2);
+
     gl_FragColor = vec4(color, 1.0);
 }
