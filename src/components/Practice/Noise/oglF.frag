@@ -23,10 +23,17 @@ float rand( float p ) {
     return fract(sin(p)*43758.5453123);
 }
 
+float cell50(vec2 cellUV){
+        vec2 buckets = floor(cellUV * 3.0);
+        return (mod(buckets.x + buckets.y, 2.0) < 1.0 ? 1.0 : 0.0);
+
+    } 
+
 void main() {
     vec2 uv = vUv;
     uv *= 10.;
     vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
+    uv *= ratio;
     // vec2 toMouse = (uMouse * newCoords - vUv * newCoords);
     // float dist = length(toMouse);
     // float valid = step(0.1, dist);
@@ -35,11 +42,19 @@ void main() {
     // float i = floor(uv.x);
     // float f = fract(uv.x);
 
+    vec3 targetColor = vec3(0.827, 1.0, 0.490);
 
-    //Get the gray value from noise
+
+    //Get the gray value for noise based on current XY
     float d2 = snoise(vec3(floor(uv), uTime / 4.));
     d2 = floor(d2 * 10.) / 10.; //Normalize to 0-1
-    vec3 color = vec3(d2);
+
+    vec2 cellUV = fract(uv);
+
+    float valid = step(0.5, d2);
+    
+
+    vec3 color = (targetColor * cell50(cellUV) * valid);
 
     gl_FragColor = vec4(color, 1.0);
 }
