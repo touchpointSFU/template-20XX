@@ -22,7 +22,7 @@ export const Page = () => {
   return (
     // <motion.main className="fixed top-0 left-0 z-10 h-full w-full items-center justify-center bg-black">
     <Fragment>
-      <div className="relative h-screen w-[50vw] resize mb-16">
+      <div className="ml-auto relative h-screen w-[50vw] resize my-16">
         <OGLCanvas>
           <Test />
         </OGLCanvas>
@@ -50,18 +50,19 @@ const Test = () => {
   //   const programRef = useRef<any>(null);
   const { canvas } = useContext(OGLCanvasContext);
   console.log("canvas", canvas);
-  //   const scroll = useLenis((lenis) => {
-  //     console.log
-  //     mousePosition.current = [
-  //       (mousePosition.current[0] + bounds.current.left) / bounds.current.width,
-  //       1 -
-  //         (mousePosition.current[1] + lenis.animatedScroll - bounds.current.top) /
-  //           bounds.current.height,
-  //     ];
-  //   });
+  const lenis = useLenis((lenis) => {
+    console.log("scroll", lenis.limit);
+    mousePositionN.current = [
+      (mousePosition.current[0] - bounds.current.left) / bounds.current.width,
+      1 -
+        (mousePosition.current[1] + lenis.animatedScroll - bounds.current.top) /
+          bounds.current.height,
+    ];
+  });
 
   const meshRef = useRef<any>(null);
   const mousePosition = useRef([0.0, 0.0]);
+  const mousePositionN = useRef([0.0, 0.0]);
   //   const windowSize = useRef([
   //     canvas?.current?.clientWidth || 0,
   //     canvas?.current?.clientHeight || 0,
@@ -86,10 +87,13 @@ const Test = () => {
   }, [bounds]);
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
-    if (canvas && canvas.current) {
-      mousePosition.current = [
-        (e.clientX + bounds.current.left) / bounds.current.width,
-        1 - (e.clientY + scrollY - bounds.current.top) / bounds.current.height,
+    if (canvas && canvas.current && lenis) {
+      mousePosition.current = [e.clientX, e.clientY];
+      mousePositionN.current = [
+        (e.clientX - bounds.current.left) / bounds.current.width,
+        1 -
+          (e.clientY + lenis.animatedScroll - bounds.current.top) /
+            bounds.current.height,
       ];
     }
   }, []);
@@ -111,8 +115,8 @@ const Test = () => {
   useFrame((_, time) => {
     meshRef.current.uniforms.uTime.value = time * 0.001;
     meshRef.current.uniforms.uMouse.value = [
-      mousePosition.current[0],
-      mousePosition.current[1],
+      mousePositionN.current[0],
+      mousePositionN.current[1],
     ];
     meshRef.current.uniforms.uResolution.value = [
       bounds.current.width,
