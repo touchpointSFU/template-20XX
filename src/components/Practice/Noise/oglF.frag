@@ -35,7 +35,7 @@ void main() {
     // vec3 color = vec3(1. - valid, 1. - valid, 1.);
     // float i = floor(uv.x);
     // float f = fract(uv.x);
-    float d2 = snoise(vec3(uv * ((0.5 + length(uMouse.x * uMouse.y)) * 3.), uTime / 2.)) * 0.5 + 0.5;
+    float d2 = snoise(vec3(uv * ((0.5 + length(uMouse)) * 3.), uTime / 2.)) * 0.5 + 0.5;
     vec3 color = vec3(d2, 0.0, 0.0);
     gl_FragColor = vec4(color, 1.0);
 }

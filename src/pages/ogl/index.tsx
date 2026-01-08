@@ -7,8 +7,10 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { u } from "motion/react-client";
@@ -63,28 +65,55 @@ const Test = () => {
   const meshRef = useRef<any>(null);
   const mousePosition = useRef([0.0, 0.0]);
   const mousePositionN = useRef([0.0, 0.0]);
-  //   const windowSize = useRef([
-  //     canvas?.current?.clientWidth || 0,
-  //     canvas?.current?.clientHeight || 0,
-  //   ]);
 
-  const bounds = useMemo(() => {
-    return {
-      current:
-        canvas && canvas.current
-          ? canvas.current.getBoundingClientRect()
-          : {
-              top: 0,
-              left: 0,
-              width: 0,
-              height: 0,
-            },
-    };
-  }, [canvas]);
+  // const [bounds, setBounds] = useState(
+  //   canvas && canvas.current
+  //     ? canvas.current.getBoundingClientRect()
+  //     : {
+  //         top: 0,
+  //         left: 0,
+  //         width: 0,
+  //         height: 0,
+  //       }
+  // );
+  const bounds = useRef<
+    | DOMRect
+    | {
+        top: number;
+        left: number;
+        width: number;
+        height: number;
+      }
+  >(
+    canvas && canvas.current
+      ? canvas.current.getBoundingClientRect()
+      : {
+          top: 0,
+          left: 0,
+          width: 0,
+          height: 0,
+        }
+  );
 
-  useEffect(() => {
+  const updateBounds = () => {
+    bounds.current =
+      canvas && canvas.current
+        ? canvas.current.getBoundingClientRect()
+        : {
+            top: 0,
+            left: 0,
+            width: 0,
+            height: 0,
+          };
+  };
+
+  useLayoutEffect(() => {
     console.log(bounds);
-  }, [bounds]);
+    window.addEventListener("resize", updateBounds);
+    return () => {
+      window.removeEventListener("resize", updateBounds);
+    };
+  }, []);
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
     if (canvas && canvas.current && lenis) {
@@ -131,34 +160,25 @@ const Test = () => {
     };
   }, [updateMousePosition]);
 
-  //   useMotionValueEvent(scrollY, "change", (latest) => {
-  //     if (canvas && canvas.current) {
-  //       mousePosition.current = [
-  //         mousePosition.current[0],
-  //         1 -
-  //           (mousePosition.current[1] * bounds.current.height +
-  //             latest -
-  //             bounds.current.top) /
-  //             bounds.current.height,
-  //       ];
-  //     }
-  //   });
+  useEffect(() => {}, []);
 
   return (
-    <mesh>
-      <geometry
-        position={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }}
-        uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
-        // position={{ size: 2, data: new Float32Array([-2, -1, 2, -1, 0, 3]) }}
-        // uv={{ size: 2, data: new Float32Array([-2, 0, 2, 0, 0, 2]) }}
-      />
-      <program
-        // ref={programRef}
-        ref={meshRef}
-        vertex={vertex}
-        fragment={fragment}
-        uniforms={uniforms}
-      />
-    </mesh>
+    <Fragment>
+      <mesh>
+        <geometry
+          position={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }}
+          uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
+          // position={{ size: 2, data: new Float32Array([-2, -1, 2, -1, 0, 3]) }}
+          // uv={{ size: 2, data: new Float32Array([-2, 0, 2, 0, 0, 2]) }}
+        />
+        <program
+          // ref={programRef}
+          ref={meshRef}
+          vertex={vertex}
+          fragment={fragment}
+          uniforms={uniforms}
+        />
+      </mesh>
+    </Fragment>
   );
 };
