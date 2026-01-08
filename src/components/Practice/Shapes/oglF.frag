@@ -13,6 +13,7 @@ void main() {
     vec2 toMouse = (uMouse * newCoords - vUv * newCoords);
     float dist = length(toMouse);
     float valid = step(0.1, dist);
-    vec3 color = vec3(valid);
+
+    vec3 color = vec3(1., 1. - valid, 1. - valid);
     gl_FragColor = vec4(color, 1.0);
 }

@@ -2,9 +2,18 @@ import { Canvas } from "react-ogl";
 import fragment from "@/components/Practice/Shapes/oglF.frag";
 import vertex from "@/components/Practice/Shapes/oglV.vert";
 import { useFrame } from "react-ogl";
-import { Fragment, useCallback, useEffect, useMemo, useRef } from "react";
-import { motion } from "motion/react";
+import {
+  Fragment,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react";
+import { motion, useMotionValueEvent, useScroll } from "motion/react";
 import { u } from "motion/react-client";
+import { OGLCanvas, OGLCanvasContext } from "@/components/OGLCanvas/OGLCanvas";
+import { useLenis } from "lenis/react";
 
 export const Page = () => {
   //   useFrame(({ time }, program) => {
@@ -13,17 +22,23 @@ export const Page = () => {
   return (
     // <motion.main className="fixed top-0 left-0 z-10 h-full w-full items-center justify-center bg-black">
     <Fragment>
-      <div className="relative z-20 h-screen w-scree mb-16">
-        <Canvas>
+      <div className="relative h-screen w-[50vw] resize mb-16">
+        <OGLCanvas>
           <Test />
-        </Canvas>
+        </OGLCanvas>
+      </div>
+      <div className="relative h-[200vh] w-screen resize"></div>
+      <div className="relative h-screen w-[50vw] resize mb-16">
+        <OGLCanvas>
+          <Test />
+        </OGLCanvas>
       </div>
 
-      <div className="relative z-20 h-screen w-screen">
-        <Canvas>
-          <Test />
-        </Canvas>
-      </div>
+      {/* <div className="relative h-screen w-screen resize">
+        // <OGLCanvas>
+        //   <Test />
+        // </OGLCanvas>
+      </div> */}
     </Fragment>
     // </motion.main>
   );
@@ -33,19 +48,50 @@ export default Page;
 
 const Test = () => {
   //   const programRef = useRef<any>(null);
+  const { canvas } = useContext(OGLCanvasContext);
+  console.log("canvas", canvas);
+  //   const scroll = useLenis((lenis) => {
+  //     console.log
+  //     mousePosition.current = [
+  //       (mousePosition.current[0] + bounds.current.left) / bounds.current.width,
+  //       1 -
+  //         (mousePosition.current[1] + lenis.animatedScroll - bounds.current.top) /
+  //           bounds.current.height,
+  //     ];
+  //   });
+
   const meshRef = useRef<any>(null);
   const mousePosition = useRef([0.0, 0.0]);
-  const windowSize = useRef([window.innerWidth, window.innerHeight]);
+  //   const windowSize = useRef([
+  //     canvas?.current?.clientWidth || 0,
+  //     canvas?.current?.clientHeight || 0,
+  //   ]);
+
+  const bounds = useMemo(() => {
+    return {
+      current:
+        canvas && canvas.current
+          ? canvas.current.getBoundingClientRect()
+          : {
+              top: 0,
+              left: 0,
+              width: 0,
+              height: 0,
+            },
+    };
+  }, [canvas]);
+
+  useEffect(() => {
+    console.log(bounds);
+  }, [bounds]);
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
-    mousePosition.current = [
-      e.clientX / window.innerWidth,
-      1 - e.clientY / window.innerHeight,
-    ];
-  }, []);
-
-  const updateWindowSize = useCallback(() => {
-    windowSize.current = [window.innerWidth, window.innerHeight];
+    if (canvas && canvas.current) {
+      mousePosition.current = [
+        (e.clientX + bounds.current.left) / bounds.current.width,
+        1 - (e.clientY + scrollY - bounds.current.top) / bounds.current.height,
+      ];
+    }
   }, []);
 
   const uniforms = useMemo(
@@ -54,41 +100,45 @@ const Test = () => {
         value: 0.0,
       },
       uMouse: {
-        value: [mousePosition.current[0], mousePosition.current[1]],
+        value: [0.0, 0.0],
       },
       uResolution: {
-        value: [window.innerWidth, window.innerHeight],
+        value: [0.0, 0.0],
       },
     }),
     []
   );
   useFrame((_, time) => {
-    // console.log(time);
     meshRef.current.uniforms.uTime.value = time * 0.001;
     meshRef.current.uniforms.uMouse.value = [
       mousePosition.current[0],
       mousePosition.current[1],
     ];
     meshRef.current.uniforms.uResolution.value = [
-      window.innerWidth,
-      window.innerHeight,
+      bounds.current.width,
+      bounds.current.height,
     ];
   });
 
   useEffect(() => {
     window.addEventListener("mousemove", updateMousePosition, false);
-
     return () => {
       window.removeEventListener("mousemove", updateMousePosition, false);
     };
   }, [updateMousePosition]);
 
-  useEffect(() => {
-    window.addEventListener("resize", updateWindowSize, false);
-    return () => {
-      window.removeEventListener("resize", updateWindowSize, false);
-    };
-  }, [updateWindowSize]);
+  //   useMotionValueEvent(scrollY, "change", (latest) => {
+  //     if (canvas && canvas.current) {
+  //       mousePosition.current = [
+  //         mousePosition.current[0],
+  //         1 -
+  //           (mousePosition.current[1] * bounds.current.height +
+  //             latest -
+  //             bounds.current.top) /
+  //             bounds.current.height,
+  //       ];
+  //     }
+  //   });
 
   return (
     <mesh>
