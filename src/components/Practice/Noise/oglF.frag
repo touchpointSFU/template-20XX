@@ -43,32 +43,31 @@ float cell75(vec2 cellUV){
 
 void main() {
     vec2 uv = vUv;
-    float mult = 10.0;
+    vec2 center = vec2(0.5);
+    float mult = 1.0;
     float timeBounce = (0.5 + sin(uTime - PI / 2.0) / 2.);
     vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
     uv *= ratio * mult;
+    center *= ratio * mult;
 
     vec2 toMetablob[MAX_METABLOBS];
     vec2 movingCoord[MAX_METABLOBS];
-    float valid = 1.0;
+    float valid = 0.0;
     vec3 color[MAX_METABLOBS];
     vec3 colorFinal = vec3(1.0);
+
     for (int i = 0; i < MAX_METABLOBS; i++) {
-        toMetablob[i] = (uMetablobs[i].xy * ratio * mult) - (vec2(0.5) * ratio * mult);
-        movingCoord[i] = (vec2(0.5) * ratio * mult) + (uMetablobs[i].z* normalize(toMetablob[i]) * timeBounce);
-        vec2 toCoord = movingCoord[i] - uv;
-        float dist = length(toCoord);
-        // valid *= clamp(dist, 0.0, 1.0);
-        float size = (uMetablobs[i].z * mult) / 10.;
-        float blob = smoothstep(size, 0.0, dist);
-        valid *= 1.0 - blob;
+        toMetablob[i] = (uMetablobs[i].xy * ratio * mult) - (center);
+        movingCoord[i] = (center) + (uMetablobs[i].z* normalize(toMetablob[i]) * timeBounce);
+        float dist = distance(movingCoord[i], uv) / mult;
+        float size = dist / uMetablobs[i].z;
+        valid += smoothstep(0.1, 0.0, dist);
     }
-        colorFinal *= valid;
+    
     // colorFinal *=  distance(uv, vec2(0.5) * ratio * mult);
 
     vec3 targetColor = vec3(0.827, 1.0, 0.490);
 
-    colorFinal *= targetColor;
     //Get the gray value for noise based on current XY
     float d3 = snoise(vec3(floor(uv), uTime / 2.0));
     float d2 = snoise(vec3(uv, uTime / 2.0));
@@ -79,5 +78,5 @@ void main() {
 
     // vec3 color = (cell25(cellUV) * targetColor * validA) + (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
     // color *= d2;
-    gl_FragColor = vec4(colorFinal, 1.0);
+    gl_FragColor = vec4(vec3(valid), 1.0);
 }
