@@ -44,9 +44,10 @@ float cell75(vec2 cellUV){
 void main() {
     vec2 uv = vUv;
     vec2 center = vec2(0.5);
-    float mult = 1.0;
+    float mult = 2.0;
     float timeBounce = (0.5 + sin(uTime - PI / 2.0) / 2.);
     vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
+    // vec2 ratio = vec2(1.0);
     uv *= ratio * mult;
     center *= ratio * mult;
 
@@ -57,13 +58,16 @@ void main() {
     vec3 colorFinal = vec3(1.0);
 
     for (int i = 0; i < MAX_METABLOBS; i++) {
-        toMetablob[i] = (uMetablobs[i].xy * ratio * mult) - (center);
-        movingCoord[i] = (center) + (uMetablobs[i].z* normalize(toMetablob[i]) * timeBounce);
-        float dist = distance(movingCoord[i], uv) / mult;
-        float size = dist / uMetablobs[i].z;
-        valid += smoothstep(0.1, 0.0, dist);
+        toMetablob[i] = (uMetablobs[i].xy) * mult * ratio;
+        movingCoord[i] = (center) + (normalize(toMetablob[i])*uMetablobs[i].z * timeBounce);
+        float dist = distance(movingCoord[i], uv);
+        // 
+        dist = dist == 0.0 ? 1.0 : (uMetablobs[i].z) / dist;
+        valid += dist / float(MAX_METABLOBS);
+        // float size = dist * uMetablobs[i].z;
+        // valid += smoothstep(0.1 * uMetablobs[i].z, 0.0, dist);
     }
-    
+    valid = min(valid, 1.0);
     // colorFinal *=  distance(uv, vec2(0.5) * ratio * mult);
 
     vec3 targetColor = vec3(0.827, 1.0, 0.490);
@@ -78,5 +82,5 @@ void main() {
 
     // vec3 color = (cell25(cellUV) * targetColor * validA) + (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
     // color *= d2;
-    gl_FragColor = vec4(vec3(valid), 1.0);
+    gl_FragColor = vec4(valid + vec3(fract(uv.x / 10.), fract(uv.y / 10.), 0.0), 1.0);
 }

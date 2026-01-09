@@ -54,7 +54,12 @@ const Test = () => {
   const metablobs = useRef(
     Array.from(
       { length: 50 },
-      () => new Vec3(Math.random(), Math.random(), Math.random())
+      () =>
+        new Vec3(
+          2 * Math.random() - 1.0,
+          2 * Math.random() - 1.0,
+          Math.random() * 0.6 + 0.4
+        )
     )
   );
   useEffect(() => {
