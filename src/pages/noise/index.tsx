@@ -13,6 +13,7 @@ import {
 import { OGLCanvas, OGLCanvasContext } from "@/components/OGLCanvas/OGLCanvas";
 import { useLenis } from "lenis/react";
 import { resolveLygia } from "resolve-lygia";
+import { Vec2, Vec3 } from "ogl";
 
 export const Page = () => {
   //   useFrame(({ time }, program) => {
@@ -21,7 +22,7 @@ export const Page = () => {
   return (
     // <motion.main className="fixed top-0 left-0 z-10 h-full w-full items-center justify-center bg-black">
     <Fragment>
-      <div className="ml-auto relative h-screen w-screen resize my-16">
+      <div className="ml-auto relative h-screen w-screen">
         <OGLCanvas>
           <Test />
         </OGLCanvas>
@@ -50,6 +51,15 @@ const Test = () => {
           bounds.current.height,
     ];
   });
+  const metablobs = useRef(
+    Array.from(
+      { length: 50 },
+      () => new Vec3(Math.random(), Math.random(), Math.random())
+    )
+  );
+  useEffect(() => {
+    console.log(metablobs.current);
+  }, []);
 
   const meshRef = useRef<any>(null);
   const mousePosition = useRef([0.0, 0.0]);
@@ -120,6 +130,9 @@ const Test = () => {
       uResolution: {
         value: [0.0, 0.0],
       },
+      uMetablobs: {
+        value: Array(50).fill(new Vec3(0.5, 0.5, 0.5)),
+      },
     }),
     []
   );
@@ -133,6 +146,7 @@ const Test = () => {
       bounds.current.width,
       bounds.current.height,
     ];
+    meshRef.current.uniforms.uMetablobs.value = metablobs.current;
   });
 
   useEffect(() => {
