@@ -12,7 +12,6 @@ import {
 } from "react";
 import { OGLCanvas, OGLCanvasContext } from "@/components/OGLCanvas/OGLCanvas";
 import { useLenis } from "lenis/react";
-import { resolveLygia } from "resolve-lygia";
 import { Vec2, Vec3 } from "ogl";
 
 export const Page = () => {
@@ -171,7 +170,7 @@ const Test = () => {
         // ref={programRef}
         ref={meshRef}
         vertex={vertex}
-        fragment={resolveLygia(fragment)}
+        fragment={fragment}
         uniforms={uniforms}
       />
     </mesh>
