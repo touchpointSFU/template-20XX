@@ -58,6 +58,7 @@ const Test = () => {
           2 * Math.random() - 1.0,
           2 * Math.random() - 1.0,
           Math.random() * 0.6 + 0.4
+          // 1.2
         )
     )
   );
@@ -135,7 +136,7 @@ const Test = () => {
         value: [0.0, 0.0],
       },
       uMetablobs: {
-        value: Array(50).fill(new Vec3(0.5, 0.5, 0.5)),
+        value: Array(50).fill(new Vec3(0.5, 0.5, 100)),
       },
     }),
     []
