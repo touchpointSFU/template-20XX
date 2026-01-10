@@ -1,6 +1,7 @@
-import fragment from "@/components/Practice/Noise/oglF.frag";
+import metaballs from "@/components/Practice/Noise/metaballs.frag";
+import halftone from "@/components/Practice/Noise/halftone.frag";
 import vertex from "@/components/Practice/Noise/oglV.vert";
-import { useFrame } from "react-ogl";
+import { useFrame, useOGL } from "react-ogl";
 import {
   Fragment,
   useCallback,
@@ -10,9 +11,11 @@ import {
   useMemo,
   useRef,
 } from "react";
+import { RenderTarget, Texture } from "ogl";
 import { OGLCanvas, OGLCanvasContext } from "@/components/OGLCanvas/OGLCanvas";
 import { useLenis } from "lenis/react";
 import { Vec2, Vec3 } from "ogl";
+import { output, u } from "motion/react-client";
 
 export const Page = () => {
   //   useFrame(({ time }, program) => {
@@ -41,6 +44,7 @@ export default Page;
 
 const Test = () => {
   const { canvas } = useContext(OGLCanvasContext);
+  const { gl } = useOGL();
 
   const lenis = useLenis((lenis) => {
     mousePositionN.current = [
@@ -63,12 +67,22 @@ const Test = () => {
     )
   );
   useEffect(() => {
-    console.log(metablobs.current);
+    console.log(targetRef);
+    console.log(gl);
   }, []);
 
   const meshRef = useRef<any>(null);
+  const targetRef = useRef<RenderTarget>(null);
+
+  const outputRef = useRef<any>(null);
   const mousePosition = useRef([0.0, 0.0]);
   const mousePositionN = useRef([0.0, 0.0]);
+
+  const renderTarget = new RenderTarget(gl, {
+    width: gl.canvas.width / 2,
+    height: gl.canvas.height / 2,
+  });
+
   //   const windowSize = useRef([
   //     canvas?.current?.clientWidth || 0,
   //     canvas?.current?.clientHeight || 0,
@@ -141,17 +155,52 @@ const Test = () => {
     }),
     []
   );
+
+  const uniforms2 = useMemo(
+    () => ({
+      uTime: {
+        value: 0.0,
+      },
+      uMouse: {
+        value: [0.0, 0.0],
+      },
+      uResolution: {
+        value: [0.0, 0.0],
+      },
+      uTexture: { value: new Texture(gl) },
+    }),
+    []
+  );
   useFrame((_, time) => {
-    meshRef.current.uniforms.uTime.value = time * 0.001;
-    meshRef.current.uniforms.uMouse.value = [
+    meshRef.current.program.uniforms.uTime.value = time * 0.001;
+    outputRef.current.uniforms.uTime.value = time * 0.001;
+
+    meshRef.current.program.uniforms.uMouse.value = [
       mousePositionN.current[0],
       mousePositionN.current[1],
     ];
-    meshRef.current.uniforms.uResolution.value = [
+    outputRef.current.uniforms.uMouse.value = [
+      mousePositionN.current[0],
+      mousePositionN.current[1],
+    ];
+
+    meshRef.current.program.uniforms.uResolution.value = [
       bounds.current.width,
       bounds.current.height,
     ];
-    meshRef.current.uniforms.uMetablobs.value = metablobs.current;
+
+    outputRef.current.uniforms.uResolution.value = [
+      bounds.current.width,
+      bounds.current.height,
+    ];
+    meshRef.current.program.uniforms.uMetablobs.value = metablobs.current;
+    // outputRef.current.uniforms.uMetablobs.value = metablobs.current;
+    // outputRef.current.uniforms.uTexture.value = targetRef.texture;
+    if (targetRef.current) {
+      outputRef.current.uniforms.uTexture.value = targetRef.current.texture;
+    }
+    // outputRef.current.uniforms.uTexture.value =
+    //   meshRef.current.program.renderTarget.texture;
   });
 
   useEffect(() => {
@@ -162,18 +211,35 @@ const Test = () => {
   }, [updateMousePosition]);
 
   return (
-    <mesh>
-      <geometry
-        position={{ size: 2, data: new Float32Array([-1, -1, 3, -1, -1, 3]) }}
-        uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
-      />
-      <program
-        // ref={programRef}
-        ref={meshRef}
-        vertex={vertex}
-        fragment={fragment}
-        uniforms={uniforms}
-      />
-    </mesh>
+    <Fragment>
+      {/* <renderTarget ref={meshRef}> */}
+      <renderTarget ref={targetRef}>
+        <mesh ref={meshRef}>
+          <geometry
+            position={{
+              size: 2,
+              data: new Float32Array([-1, -1, 3, -1, -1, 3]),
+            }}
+            uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
+          />
+          <program vertex={vertex} fragment={metaballs} uniforms={uniforms} />
+        </mesh>
+      </renderTarget>
+      <mesh>
+        <geometry
+          position={{
+            size: 2,
+            data: new Float32Array([-1, -1, 3, -1, -1, 3]),
+          }}
+          uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
+        />
+        <program
+          ref={outputRef}
+          vertex={vertex}
+          fragment={halftone}
+          uniforms={uniforms2}
+        />
+      </mesh>
+    </Fragment>
   );
 };

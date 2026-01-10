@@ -45,6 +45,7 @@ float cellVal(float uvGray, vec2 cellUV){
     return uvGray > 0.8 ? 1. : (uvGray > 0.6 ? cell75(cellUV) : (uvGray > 0.4 ? cell50(cellUV) : uvGray > 0.2 ? cell25(cellUV) : 0.0));
 }
 
+
 void main() {
     vec2 uv = vUv;
     vec2 center = vec2(0.5);
@@ -83,8 +84,8 @@ void main() {
     vec2 cellUV = fract(uv * 8.);
     
     // vec3 color = vec3(1.0) * (distance(movingCoord[3], uv));
-    // vec3 color = vec3(cellVal(valid, cellUV));
-    vec3 color = vec3(cellUV, 0.);
+    vec3 color = vec3(valid);
+    // vec3 color = vec3(cellUV, 0.);
     // vec3 color = vec3(cellUV + vec2(valid), 0.); //+ (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
     // color *= d2;
     gl_FragColor = vec4(color, 1.0);
