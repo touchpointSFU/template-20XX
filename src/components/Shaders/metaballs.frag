@@ -14,7 +14,7 @@ varying vec2 vUv;
 void main() {
     vec2 uv = vUv;
     vec2 center = vec2(0.5);
-    float mult = 4.0;
+    float mult = 3.0;
     float timeBounce = (0.5 + sin(uTime - PI / 2.0) / 2.);
     vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
     // vec2 ratio = vec2(1.0);
