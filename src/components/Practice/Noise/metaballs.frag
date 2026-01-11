@@ -88,5 +88,5 @@ void main() {
     // vec3 color = vec3(cellUV, 0.);
     // vec3 color = vec3(cellUV + vec2(valid), 0.); //+ (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
     // color *= d2;
-    gl_FragColor = vec4(color, 1.0);
+    gl_FragColor = vec4(vec3(1., 0., 1.), 1.0);
 }

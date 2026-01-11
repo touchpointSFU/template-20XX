@@ -1,7 +1,7 @@
 import metaballs from "@/components/Practice/Noise/metaballs.frag";
 import halftone from "@/components/Practice/Noise/halftone.frag";
 import vertex from "@/components/Practice/Noise/oglV.vert";
-import { Canvas, render, useFrame, useOGL } from "react-ogl";
+import { render, useFrame, useOGL } from "react-ogl";
 import {
   Fragment,
   useCallback,
@@ -16,38 +16,8 @@ import { OGLCanvas, OGLCanvasContext } from "@/components/OGLCanvas/OGLCanvas";
 import { useLenis } from "lenis/react";
 import { Vec2, Vec3 } from "ogl";
 import { output, u } from "motion/react-client";
-import { Halftoner } from "@/components/Practice/Noise/Halftoner";
 
-export const Page = () => {
-  //   useFrame(({ time }, program) => {
-  //     programRef.current
-  //   });
-  return (
-    // <motion.main className="fixed top-0 left-0 z-10 h-full w-full items-center justify-center bg-black">
-    <Fragment>
-      <div className="ml-auto relative h-screen w-screen">
-        <Canvas>
-          <Halftoner />
-          <mesh>
-            <box />
-            <normalProgram />
-          </mesh>
-        </Canvas>
-      </div>
-
-      {/* <div className="relative h-screen w-screen resize">
-        // <OGLCanvas>
-        //   <Test />
-        // </OGLCanvas>
-      </div> */}
-    </Fragment>
-    // </motion.main>
-  );
-};
-
-export default Page;
-
-const Test = () => {
+export const Halftoner = () => {
   const { canvas } = useContext(OGLCanvasContext);
   const { gl } = useOGL();
 
@@ -232,7 +202,7 @@ const Test = () => {
 
   return (
     <Fragment>
-      <mesh ref={outputRef} visible={false}>
+      <mesh visible={true} ref={outputRef}>
         <geometry
           position={{
             size: 2,
@@ -246,16 +216,6 @@ const Test = () => {
           fragment={halftone}
           uniforms={uniforms2}
         />
-      </mesh>
-      <mesh ref={meshRef}>
-        <geometry
-          position={{
-            size: 2,
-            data: new Float32Array([-1, -1, 3, -1, -1, 3]),
-          }}
-          uv={{ size: 2, data: new Float32Array([0, 0, 2, 0, 0, 2]) }}
-        />
-        <program vertex={vertex} fragment={metaballs} uniforms={uniforms} />
       </mesh>
     </Fragment>
   );

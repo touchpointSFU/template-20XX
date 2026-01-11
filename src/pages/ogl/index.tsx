@@ -1,9 +1,10 @@
-import { Canvas } from "react-ogl";
+import { Canvas, useOGL } from "react-ogl";
 import fragment from "@/components/Practice/Shapes/oglF.frag";
 import vertex from "@/components/Practice/Shapes/oglV.vert";
 import { useFrame } from "react-ogl";
 import {
   Fragment,
+  use,
   useCallback,
   useContext,
   useEffect,
@@ -49,7 +50,12 @@ export const Page = () => {
 export default Page;
 
 const Test = () => {
-  const { canvas } = useContext(OGLCanvasContext);
+  // useEf
+  const canvas = useOGL().gl.canvas;
+  useEffect(() => {
+    console.log(canvas);
+  }, []);
+  // const { canvas } = useContext(OGLCanvasContext);
 
   const lenis = useLenis((lenis) => {
     mousePositionN.current = [
@@ -65,8 +71,8 @@ const Test = () => {
   const mousePositionN = useRef([0.0, 0.0]);
 
   // const [bounds, setBounds] = useState(
-  //   canvas && canvas.current
-  //     ? canvas.current.getBoundingClientRect()
+  //   canvas && canvas
+  //     ? canvas.getBoundingClientRect()
   //     : {
   //         top: 0,
   //         left: 0,
@@ -83,8 +89,8 @@ const Test = () => {
         height: number;
       }
   >(
-    canvas && canvas.current
-      ? canvas.current.getBoundingClientRect()
+    canvas && canvas
+      ? canvas.getBoundingClientRect()
       : {
           top: 0,
           left: 0,
@@ -95,8 +101,8 @@ const Test = () => {
 
   const updateBounds = () => {
     bounds.current =
-      canvas && canvas.current
-        ? canvas.current.getBoundingClientRect()
+      canvas && canvas
+        ? canvas.getBoundingClientRect()
         : {
             top: 0,
             left: 0,
@@ -113,7 +119,7 @@ const Test = () => {
   }, []);
 
   const updateMousePosition = useCallback((e: MouseEvent) => {
-    if (canvas && canvas.current && lenis) {
+    if (canvas && canvas && lenis) {
       mousePosition.current = [e.clientX, e.clientY];
       mousePositionN.current = [
         (e.clientX - bounds.current.left) / bounds.current.width,
