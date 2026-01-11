@@ -76,17 +76,12 @@ void main() {
     valid = min(valid, 1.0);
     // colorFinal *=  distance(uv, vec2(0.5) * ratio * mult);
 
-    vec3 targetColor = vec3(0.827, 1.0, 0.490);
-
     //Get the gray value for noise based on current XY
     float d3 = snoise(vec3(floor(uv), uTime / 2.0));
 
     vec2 cellUV = fract(uv * 8.);
     
-    // vec3 color = vec3(1.0) * (distance(movingCoord[3], uv));
     vec3 color = vec3(valid);
-    // vec3 color = vec3(cellUV, 0.);
-    // vec3 color = vec3(cellUV + vec2(valid), 0.); //+ (targetColor * cell50(cellUV) * validB) + (targetColor * cell75(cellUV) * validC) + validD * targetColor;
-    // color *= d2;
+
     gl_FragColor = vec4(vec3(1., 0., 1.), 1.0);
 }
