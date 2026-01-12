@@ -11,7 +11,7 @@ import test from "node:test";
 import { hex } from "motion";
 
 export function FinalScene({ texture }: { texture: any }) {
-  const pane = new Pane();
+  const pane = useMemo(() => new Pane(), []);
 
   function hexToFloatArray(hex: string) {
     let cleanHex = hex.replace("#", "");
@@ -35,7 +35,6 @@ export function FinalScene({ texture }: { texture: any }) {
     () => ({
       targetColor: "#D3FF7D",
       secondColor: "#FF39E1",
-      thirdColor: "#CA2CBB",
       background: "#000000",
     }),
     []
@@ -50,25 +49,9 @@ export function FinalScene({ texture }: { texture: any }) {
     pane.addBinding(testUniforms, "secondColor", {
       label: "final",
     });
-    pane.addBinding(testUniforms, "thirdColor", {
-      label: "final_accent",
-    });
     pane.addBinding(testUniforms, "background", {
       label: "background",
     });
-    // pane.addBinding(program.uniforms.uSecondColor, "value", {
-    //   label: "secondColor",
-    // });
-    // pane.addBinding(program.uniforms.uThirdColor, "value", {
-    //   label: "thirdColor",
-    // });
-    // pane.addBinding(testUniforms, "targetColor");
-    // pane.addBinding(program.uniforms.uTargetColor, "targetColor");
-    // pane.addBinding(program.uniforms.uSecondColor, "secondColor");
-    // pane.addBinding(program.uniforms.uThirdColor, "thirdColor");
-    // return () => {
-    //   pane.dispose();
-    // };
   }, []);
 
   useFrame(() => {
@@ -77,9 +60,6 @@ export function FinalScene({ texture }: { texture: any }) {
     );
     program.uniforms.uSecondColor.value = hexToFloatArray(
       testUniforms.secondColor
-    );
-    program.uniforms.uThirdColor.value = hexToFloatArray(
-      testUniforms.thirdColor
     );
     program.uniforms.uBackground.value = hexToFloatArray(
       testUniforms.background
@@ -99,7 +79,6 @@ export function FinalScene({ texture }: { texture: any }) {
           uTexture: { value: texture },
           uTargetColor: { value: hexToFloatArray(testUniforms.targetColor) },
           uSecondColor: { value: hexToFloatArray(testUniforms.secondColor) },
-          uThirdColor: { value: hexToFloatArray(testUniforms.thirdColor) },
           uBackground: { value: hexToFloatArray(testUniforms.background) },
         },
       }),

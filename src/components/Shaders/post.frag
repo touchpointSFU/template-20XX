@@ -5,7 +5,6 @@ uniform vec2 uResolution;
 uniform sampler2D uTexture;
 uniform vec3 uTargetColor;
 uniform vec3 uSecondColor;
-uniform vec3 uThirdColor;
 uniform vec3 uBackground;
 
 #define pixelSize 48.0
@@ -264,7 +263,7 @@ vec3 cell90(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     return uTargetColor * clamp(clamp(quad + quad2, 0., 1.0) - (rim + core), 0.0, 1.0) + uSecondColor * (rim + core);// + rim - core;
 }
 
-vec3 cell100(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, vec3 uThirdColor){
+vec3 cell100(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     vec2 center = vec2(0.0, 0.0);
   float quad = 1.0 - step(remap.x + 1.0, remap.y);
@@ -311,11 +310,11 @@ vec3 cell100(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, vec3 uThirdColor
     float quads = clamp(cquad + cquad2 + cquad3 + cquad4, 0., 1.0);
     float circs = clamp(circ + circ2 + circ3 + circ4, 0., 1.);
     
-    return outerRim * uThirdColor + uSecondColor * clamp(quads + quad2 - circs + rim, 0., 1.0) + (clamp(quad - outerRim - rim, 0., 1.0) + circs) * uTargetColor;// - (outerRim + rim);
+    return outerRim * mix(uSecondColor, uBackground, 0.5) + uSecondColor * clamp(quads + quad2 - circs + rim, 0., 1.0) + (clamp(quad - outerRim - rim, 0., 1.0) + circs) * uTargetColor;// - (outerRim + rim);
 }
 
-vec3 cellVal(float uvGray, vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, vec3 uThirdColor){
-  return uvGray > 0.9 ? cell100(cellUV, uTargetColor, uSecondColor, uThirdColor) : 
+vec3 cellVal(float uvGray, vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
+  return uvGray > 0.9 ? cell100(cellUV, uTargetColor, uSecondColor) : 
       uvGray > 0.81 ? cell90(cellUV, uTargetColor, uSecondColor) : 
       uvGray > 0.72 ? cell80(cellUV, uTargetColor, uSecondColor) : 
       uvGray > 0.63 ? cell70(cellUV, uTargetColor, uSecondColor) : 
@@ -336,17 +335,14 @@ void main() {
   // vec2 grouping = mod(floor(pix / pixelSize), 2.0);
   vec3 col = texture2D(uTexture, floor(pix / pixelSize) * pixelSize / uResolution.xy).rgb;
 //  vec3 tex = col;
-  vec3 final = cellVal(col.r, pixelmap, uTargetColor, uSecondColor, uThirdColor);
-  // vec3 uTargetColor = vec3(0.827, 1.0, 0.490);
-  // vec3 uSecondColor = vec3(1.0, 0.224, 0.882);
-  // vec3 uThirdColor = vec3(0.792, 0.173, 0.698);
+  vec3 final = cellVal(col.r, pixelmap, uTargetColor, uSecondColor);
   // vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
   // vec2 roundedUV = floor(vUv * 40.0) / 40.0;
   // roundedUV *= ratio;
   // vec3 col = texture2D(uTexture, roundedUV).rgb;
   // vec3 grid = vec3(fract(uv * 40.0 * ratio), 0.0);
   // vec3 col = texture2D(uTexture, floor(pix / 16.0) * 16.0 / uResolution.xy).rgb;
-  gl_FragColor = vec4(final, 1.0);
+//   gl_FragColor = vec4(final, 1.0);
 
-//   gl_FragColor = vec4(final.r == 0. && final.g == 0. && final.b == 0. ? uBackground : final, 1.0);
+  gl_FragColor = vec4(final.r == 0. && final.g == 0. && final.b == 0. ? uBackground : final, 1.0);
 }
