@@ -3,10 +3,14 @@ varying vec2 vUv;
 
 uniform vec2 uResolution;
 uniform sampler2D uTexture;
+uniform vec3 uTargetColor;
+uniform vec3 uSecondColor;
+uniform vec3 uThirdColor;
+uniform vec3 uBackground;
 
 #define pixelSize 48.0
 
-vec3 cell10(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell10(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     // vec2 uv = fragCoord/iResolution.xy;
     
     vec2 remap = cellUV * 2.0 - 1.0;
@@ -17,10 +21,10 @@ vec3 cell10(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     float cut = 1.0 - step(remap.x + 0.3, abs(remap.y));
     cut *= 1.0 - step(-remap.x + 0.3, abs(remap.y));
     // vec2 buckets = floor(cellUV * 3.0);
-    return targetColor * (outer - cut);
+    return uTargetColor * (outer - cut);
 } 
 
-vec3 cell20(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell20(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     
     float valid = 1. - step(0.025 * pow(2.0, 1./2.), distance(remap.x, 0.));
@@ -39,10 +43,10 @@ vec3 cell20(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     diagonal2 *= 1.0 - step(remap.x + 0.5 * pow(2.0, 1./2.), remap.y);
     diagonal2 *= 1.0 - step(-remap.x + 0.5 * pow(2.0, 1./2.), -remap.y);
 
-    return targetColor * min(valid + valid2 + diagonal + diagonal2, 1.0);
+    return uTargetColor * min(valid + valid2 + diagonal + diagonal2, 1.0);
 } 
 
-vec3 cell30(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell30(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     vec2 center = vec2(0., 0.);
     
@@ -66,10 +70,10 @@ vec3 cell30(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     float all = clamp((valid3 - bar - bar2 - core), 0.0, 1.0);
     float rimAndCore = clamp((valid - valid2 + core), 0.0, 1.0);
 
-    return all * targetColor + rimAndCore * secondColor;
+    return all * uTargetColor + rimAndCore * uSecondColor;
 } 
 
-vec3 cell40(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell40(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     
     float valid = 1.0 - step(remap.x + 0.4, abs(remap.y));
@@ -97,11 +101,11 @@ vec3 cell40(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     star4 *= 1.0 - step(remap.x + 0.6 * pow(2.0, 1./2.), remap.y);
     star4 *= 1.0 - step(-remap.x + 0.6 * pow(2.0, 1./2.), -remap.y);
 
-    return targetColor * clamp(clamp(star + star2 + star3 + star4, 0., 1.0) - (square), 0.0, 1.0);
+    return uTargetColor * clamp(clamp(star + star2 + star3 + star4, 0., 1.0) - (square), 0.0, 1.0);
 } 
 
 
-vec3 cell50(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell50(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     
     float valid = 1.0 - step(remap.x + 0.5, abs(remap.y));
@@ -131,10 +135,10 @@ vec3 cell50(vec2 cellUV, vec3 targetColor, vec3 secondColor){
 
     float starSum = clamp(star + star2 + star3 + star4, 0.0, 1.0);
 
-    return secondColor * clamp(square - (starSum),0.0, 1.0) + starSum * targetColor;
+    return uSecondColor * clamp(square - (starSum),0.0, 1.0) + starSum * uTargetColor;
 } 
 
-vec3 cell60(vec2 cellUV, vec3 targetColor, vec3 secondColor  ){
+vec3 cell60(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor  ){
     vec2 remap = cellUV * 2.0 - 1.0;
     
     float petal = step(distance(remap, vec2(0.7,0.0)), 0.7);
@@ -163,10 +167,10 @@ vec3 cell60(vec2 cellUV, vec3 targetColor, vec3 secondColor  ){
     
     float all = clamp(petal + petal2 + petal3 + petal4, 0.0, 1.0);
     float inner = clamp(ipetal + ipetal2 + ipetal3 + ipetal4, 0.0, 1.0);
-    return targetColor * (all - inner) + secondColor * inner;
+    return uTargetColor * (all - inner) + uSecondColor * inner;
 } 
 
-vec3 cell70(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell70(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     
     float petal = step(distance(remap, vec2(0.7,0.0)), 0.7);
@@ -199,10 +203,10 @@ vec3 cell70(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     vbar2 *= 1.0 - step(remap.x, -0.5);
     vbar2 *= step(distance(0.0, remap.y), 0.9);
     
-    return petals * secondColor + clamp(clamp(hbar + hbar2 + vbar + vbar2, 0.0, 1.0) - petals, 0.0, 1.0) * targetColor;
+    return petals * uSecondColor + clamp(clamp(hbar + hbar2 + vbar + vbar2, 0.0, 1.0) - petals, 0.0, 1.0) * uTargetColor;
 } 
 
-vec3 cell80(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell80(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     vec2 center = vec2(0.0, 0.0);
     
@@ -236,10 +240,10 @@ vec3 cell80(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     
     float quads = clamp(clamp(quad + quad2 + quad3 + quad4, 0.0, 1.0) - (outerRim + innerRim),0.0, 1.0);
     
-    return targetColor * clamp(core + quads - innerRim - outerRim, 0.0, 1.0) + (innerRim + outerRim) * secondColor;
+    return uTargetColor * clamp(core + quads - innerRim - outerRim, 0.0, 1.0) + (innerRim + outerRim) * uSecondColor;
 }
 
-vec3 cell90(vec2 cellUV, vec3 targetColor, vec3 secondColor){
+vec3 cell90(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     vec2 center = vec2(0.0, 0.0);
     
@@ -257,10 +261,10 @@ vec3 cell90(vec2 cellUV, vec3 targetColor, vec3 secondColor){
     rim -= step(distance(remap, center), 0.6);
     
     float core = step(distance(remap, center), 0.3);
-    return targetColor * clamp(clamp(quad + quad2, 0., 1.0) - (rim + core), 0.0, 1.0) + secondColor * (rim + core);// + rim - core;
+    return uTargetColor * clamp(clamp(quad + quad2, 0., 1.0) - (rim + core), 0.0, 1.0) + uSecondColor * (rim + core);// + rim - core;
 }
 
-vec3 cell100(vec2 cellUV, vec3 targetColor, vec3 secondColor, vec3 thirdColor){
+vec3 cell100(vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, vec3 uThirdColor){
     vec2 remap = cellUV * 2.0 - 1.0;
     vec2 center = vec2(0.0, 0.0);
   float quad = 1.0 - step(remap.x + 1.0, remap.y);
@@ -307,20 +311,20 @@ vec3 cell100(vec2 cellUV, vec3 targetColor, vec3 secondColor, vec3 thirdColor){
     float quads = clamp(cquad + cquad2 + cquad3 + cquad4, 0., 1.0);
     float circs = clamp(circ + circ2 + circ3 + circ4, 0., 1.);
     
-    return outerRim * thirdColor + secondColor * clamp(quads + quad2 - circs + rim, 0., 1.0) + (clamp(quad - outerRim - rim, 0., 1.0) + circs) * targetColor;// - (outerRim + rim);
+    return outerRim * uThirdColor + uSecondColor * clamp(quads + quad2 - circs + rim, 0., 1.0) + (clamp(quad - outerRim - rim, 0., 1.0) + circs) * uTargetColor;// - (outerRim + rim);
 }
 
-vec3 cellVal(float uvGray, vec2 cellUV, vec3 targetColor, vec3 secondColor, vec3 thirdColor){
-  return uvGray > 0.9 ? cell100(cellUV, targetColor, secondColor, thirdColor) : 
-      uvGray > 0.81 ? cell90(cellUV, targetColor, secondColor) : 
-      uvGray > 0.72 ? cell80(cellUV, targetColor, secondColor) : 
-      uvGray > 0.63 ? cell70(cellUV, targetColor, secondColor) : 
-      uvGray > 0.54 ? cell60(cellUV, targetColor, secondColor) : 
-      uvGray > 0.45 ? cell50(cellUV, targetColor, secondColor) : 
-      uvGray > 0.36 ? cell40(cellUV, targetColor, secondColor) : 
-      uvGray > 0.27 ? cell30(cellUV, targetColor, secondColor) : 
-      uvGray > 0.18 ? cell20(cellUV, targetColor, secondColor) : 
-      uvGray > 0.09 ? cell10(cellUV, targetColor, secondColor) : vec3(0.0);
+vec3 cellVal(float uvGray, vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, vec3 uThirdColor){
+  return uvGray > 0.9 ? cell100(cellUV, uTargetColor, uSecondColor, uThirdColor) : 
+      uvGray > 0.81 ? cell90(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.72 ? cell80(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.63 ? cell70(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.54 ? cell60(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.45 ? cell50(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.36 ? cell40(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.27 ? cell30(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.18 ? cell20(cellUV, uTargetColor, uSecondColor) : 
+      uvGray > 0.09 ? cell10(cellUV, uTargetColor, uSecondColor) : vec3(0.0);
 }
 
 
@@ -332,9 +336,10 @@ void main() {
   // vec2 grouping = mod(floor(pix / pixelSize), 2.0);
   vec3 col = texture2D(uTexture, floor(pix / pixelSize) * pixelSize / uResolution.xy).rgb;
 
-  vec3 targetColor = vec3(0.827, 1.0, 0.490);
-  vec3 secondColor = vec3(1.0, 0.224, 0.882);
-  vec3 thirdColor = vec3(0.792, 0.173, 0.698);
+  vec3 final = cellVal(col.r, pixelmap, uTargetColor, uSecondColor, uThirdColor);
+  // vec3 uTargetColor = vec3(0.827, 1.0, 0.490);
+  // vec3 uSecondColor = vec3(1.0, 0.224, 0.882);
+  // vec3 uThirdColor = vec3(0.792, 0.173, 0.698);
   // vec2 ratio = vec2(uResolution.x / uResolution.y, 1.0);
   // vec2 roundedUV = floor(vUv * 40.0) / 40.0;
   // roundedUV *= ratio;
@@ -343,5 +348,5 @@ void main() {
   // vec3 col = texture2D(uTexture, floor(pix / 16.0) * 16.0 / uResolution.xy).rgb;
   // gl_FragColor = vec4(tex, 1.0);
 
-  gl_FragColor = vec4(cellVal(col.r, pixelmap, targetColor, secondColor, thirdColor), 1.0);
+  gl_FragColor = vec4(final.r == 0. && final.g == 0. && final.b == 0. ? uBackground : final, 1.0);
 }

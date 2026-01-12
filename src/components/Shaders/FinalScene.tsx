@@ -1,13 +1,93 @@
 import { Mesh, Program, Plane } from "ogl";
 // import { Mesh, Program, Plane } from "react-ogl";
-import { useLayoutEffect, useMemo } from "react";
+import { useEffect, useLayoutEffect, useMemo } from "react";
 
 import postVert from "@/components/Shaders/post.vert";
 import postFrag from "@/components/Shaders/post.frag";
-import { useOGL } from "react-ogl";
-import { u } from "motion/react-client";
+import { useFrame, useOGL } from "react-ogl";
+import { Pane } from "tweakpane";
+import { p } from "motion/react-client";
+import test from "node:test";
+import { hex } from "motion";
 
 export function FinalScene({ texture }: { texture: any }) {
+  const pane = new Pane();
+
+  function hexToFloatArray(hex: string) {
+    let cleanHex = hex.replace("#", "");
+
+    // Handle shorthand (#fff)
+    if (cleanHex.length === 3) {
+      cleanHex = cleanHex
+        .split("")
+        .map((c) => c + c)
+        .join("");
+    }
+
+    const r = parseInt(cleanHex.substring(0, 2), 16) / 255;
+    const g = parseInt(cleanHex.substring(2, 4), 16) / 255;
+    const b = parseInt(cleanHex.substring(4, 6), 16) / 255;
+
+    return [r, g, b];
+  }
+
+  const testUniforms = useMemo(
+    () => ({
+      targetColor: "#D3FF7D",
+      secondColor: "#FF39E1",
+      thirdColor: "#CA2CBB",
+      background: "#000000",
+    }),
+    []
+  );
+
+  useEffect(() => {
+    console.log(pane);
+    console.log(program.uniforms);
+    pane.addBinding(testUniforms, "targetColor", {
+      label: "initial",
+    });
+    pane.addBinding(testUniforms, "secondColor", {
+      label: "final",
+    });
+    pane.addBinding(testUniforms, "thirdColor", {
+      label: "final_accent",
+    });
+    pane.addBinding(testUniforms, "background", {
+      label: "background",
+    });
+    // pane.addBinding(program.uniforms.uSecondColor, "value", {
+    //   label: "secondColor",
+    // });
+    // pane.addBinding(program.uniforms.uThirdColor, "value", {
+    //   label: "thirdColor",
+    // });
+    // pane.addBinding(testUniforms, "targetColor");
+    // pane.addBinding(program.uniforms.uTargetColor, "targetColor");
+    // pane.addBinding(program.uniforms.uSecondColor, "secondColor");
+    // pane.addBinding(program.uniforms.uThirdColor, "thirdColor");
+    // return () => {
+    //   pane.dispose();
+    // };
+  }, []);
+
+  useFrame(() => {
+    program.uniforms.uTargetColor.value = hexToFloatArray(
+      testUniforms.targetColor
+    );
+    program.uniforms.uSecondColor.value = hexToFloatArray(
+      testUniforms.secondColor
+    );
+    program.uniforms.uThirdColor.value = hexToFloatArray(
+      testUniforms.thirdColor
+    );
+    program.uniforms.uBackground.value = hexToFloatArray(
+      testUniforms.background
+    );
+  });
+  // program.uniforms.uTargetColor.value = hexToFloatArray(
+  //   testUniforms.targetColor
+
   const { gl, size } = useOGL();
   const program = useMemo(
     () =>
@@ -17,6 +97,10 @@ export function FinalScene({ texture }: { texture: any }) {
         uniforms: {
           uResolution: { value: [size.width, size.height] },
           uTexture: { value: texture },
+          uTargetColor: { value: hexToFloatArray(testUniforms.targetColor) },
+          uSecondColor: { value: hexToFloatArray(testUniforms.secondColor) },
+          uThirdColor: { value: hexToFloatArray(testUniforms.thirdColor) },
+          uBackground: { value: hexToFloatArray(testUniforms.background) },
         },
       }),
     [texture]
