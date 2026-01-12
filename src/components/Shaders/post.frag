@@ -69,8 +69,34 @@ float cell30(vec2 cellUV){
 } 
 
 float cell40(vec2 cellUV){
-    vec2 buckets = floor(cellUV * 3.0);
-    return (mod(buckets.x + buckets.y, 2.0) < 1.0 ? 1.0 : 0.0);
+    vec2 remap = cellUV * 2.0 - 1.0;
+    
+    float valid = 1.0 - step(remap.x + 0.4, abs(remap.y));
+    valid *= 1.0 - step(-remap.x + 0.4, abs(remap.y));
+    
+    float valid2 = 1.0 - step(remap.x + 0.3, abs(remap.y));
+    valid2 *= 1.0 - step(-remap.x + 0.3, abs(remap.y));
+   
+    float square = valid - valid2;
+
+    
+    float star = 1. - step(0.025 * pow(2.0, 1./2.), distance(remap.x, 0.));
+    star *= 1. - step(0.6, distance(remap.y, 0.));
+    
+    float star2 = 1. - step(0.025 * pow(2.0, 1./2.), distance(remap.y, 0.));
+    star2 *= 1. - step(0.6, distance(remap.x, 0.));
+    
+    float star3 = step(remap.x, remap.y + 0.05 );
+    star3 *= 1.0 - step(remap.x, remap.y - 0.05 );
+    star3 *= 1.0 - step(-remap.x + 0.6 * pow(2.0, 1./2.), remap.y);
+    star3 *= 1.0 - step(remap.x + 0.6 * pow(2.0, 1./2.), -remap.y);
+    
+    float star4 = step(-remap.x, remap.y + 0.05 );
+    star4 *= 1.0 - step(-remap.x, remap.y - 0.05 );
+    star4 *= 1.0 - step(remap.x + 0.6 * pow(2.0, 1./2.), remap.y);
+    star4 *= 1.0 - step(-remap.x + 0.6 * pow(2.0, 1./2.), -remap.y);
+
+    return clamp(star + star2 + star3 + star4,0., 1.0) - (square);
 } 
 
 
@@ -275,7 +301,7 @@ float cellVal(float uvGray, vec2 cellUV){
       uvGray > 0.63 ? cell70(cellUV) : 
       uvGray > 0.54 ? cell60(cellUV) : 
        uvGray > 0.45 ? cell50(cellUV) : 
-      //  uvGray > 0.4 ? cell40(cellUV) : 
+       uvGray > 0.4 ? cell40(cellUV) : 
       uvGray > 0.27 ? cell30(cellUV) : 
       uvGray > 0.18 ? cell20(cellUV) : 
       uvGray > 0.09 ? cell10(cellUV) : 0.0;
