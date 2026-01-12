@@ -189,22 +189,96 @@ float cell80(vec2 cellUV){
     
     float innerRim = step(distance(remap, center), 0.4);
     innerRim -= step(distance(remap, center), 0.24);
+
+    float core = step(distance(remap, center), 0.24);
     
     float quads = clamp(clamp(quad + quad2 + quad3 + quad4, 0.0, 1.0) - (outerRim + innerRim),0.0, 1.0);
     
-    return quads + innerRim + outerRim;
+    return quads + innerRim + outerRim + core;
 }
 
+float cell90(vec2 cellUV){
+    vec2 remap = cellUV * 2.0 - 1.0;
+    vec2 center = vec2(0.0, 0.0);
+    
+    float quad = 1.0 - step(remap.x + 0.5, remap.y);
+    quad *= step(remap.x - 0.5, remap.y);
+     quad *= 1.0 - step(-remap.x + 1.5, remap.y);
+    quad *= step(-remap.x - 1.5, remap.y);
+    
+    float quad2 = 1.0 - step(remap.x + 0.5, -remap.y);
+    quad2 *= step(remap.x - 0.5, -remap.y);
+     quad2 *= 1.0 - step(-remap.x + 1.5, -remap.y);
+    quad2 *= step(-remap.x - 1.5, -remap.y);
+    
+    float rim = step(distance(remap, center), 0.8);
+    rim -= step(distance(remap, center), 0.6);
+    
+    float core = step(distance(remap, center), 0.3);
+    return clamp(quad + quad2, 0., 1.0) + rim - core;
+}
+
+float cell100(vec2 cellUV){
+    vec2 remap = cellUV * 2.0 - 1.0;
+    vec2 center = vec2(0.0, 0.0);
+  float quad = 1.0 - step(remap.x + 1.0, remap.y);
+    quad *= step(remap.x - 1.0, remap.y);
+     quad *= 1.0 - step(-remap.x + 1.0, remap.y);
+    quad *= step(-remap.x - 1.0, remap.y);
+    
+    float quad2 = 1.0 - step(remap.x + 0.5, -remap.y);
+    quad2 *= step(remap.x - 0.5, -remap.y);
+     quad2 *= 1.0 - step(-remap.x + 1.5, -remap.y);
+    quad2 *= step(-remap.x - 1.5, -remap.y);
+    
+    float cquad = step(remap.x, 0.9);
+    cquad *= 1.0 - step(remap.x, 0.7);
+    cquad *= step(remap.y, 0.9);
+    cquad *= 1.0 - step(remap.y, 0.7);
+    
+    float cquad2 = 1.0 - step(remap.x, -0.9);
+    cquad2 *= step(remap.x, -0.7);
+    cquad2 *= step(remap.y, 0.9);
+    cquad2 *= 1.0 - step(remap.y, 0.7);
+    
+    float cquad3 = 1.0 - step(remap.y, -0.9);
+    cquad3 *= step(remap.y, -0.7);
+    cquad3 *= step(remap.x, 0.9);
+    cquad3 *= 1.0 - step(remap.x, 0.7);
+   
+    float cquad4 = 1.0 - step(remap.y, -0.9);
+    cquad4 *= step(remap.y, -0.7);
+    cquad4 *= 1.0 - step(remap.x, -0.9);
+    cquad4 *= step(remap.x, -0.7);
+    
+    float circ = step(distance(remap, vec2(0.7,0.7)), 0.1);
+    float circ2 = step(distance(remap, vec2(-0.7,0.7)), 0.1);
+    float circ3 = step(distance(remap, vec2(0.7,-0.7)), 0.1);
+    float circ4 = step(distance(remap, vec2(-0.7,-0.7)), 0.1);
+    
+    float outerRim = step(distance(remap, center), 0.8);
+    outerRim -= step(distance(remap, center), 0.56);
+    
+    float rim = step(distance(remap, center), 0.4);
+    rim -= step(distance(remap, center), 0.2);
+    
+    float core = step(distance(remap, center), 0.3);
+    float quads = clamp(cquad + cquad2 + cquad3 + cquad4, 0., 1.0);
+    float circs = clamp(circ + circ2 + circ3 + circ4, 0., 1.);
+    
+    return clamp(quad + quads + circs, 0., 1.0) - (outerRim + rim);
+}
 float cellVal(float uvGray, vec2 cellUV){
-  // return uvGray > 0.9 ? cell90(cellUV) : 
-       return uvGray > 0.8 ? cell80(cellUV) : 
-        uvGray > 0.7 ? cell70(cellUV) : 
-       uvGray > 0.6 ? cell60(cellUV) : 
-       uvGray > 0.5 ? cell50(cellUV) : 
+  return uvGray >0.9 ? cell100(cellUV) : 
+      uvGray> 0.81 ? cell90(cellUV) : 
+      uvGray > 0.72 ? cell80(cellUV) : 
+      uvGray > 0.63 ? cell70(cellUV) : 
+      uvGray > 0.54 ? cell60(cellUV) : 
+       uvGray > 0.45 ? cell50(cellUV) : 
       //  uvGray > 0.4 ? cell40(cellUV) : 
-       uvGray > 0.3 ? cell30(cellUV) : 
-       uvGray > 0.2 ? cell20(cellUV) : 
-       uvGray > 0.1 ? cell10(cellUV) : 0.0;
+      uvGray > 0.27 ? cell30(cellUV) : 
+      uvGray > 0.18 ? cell20(cellUV) : 
+      uvGray > 0.09 ? cell10(cellUV) : 0.0;
 }
 
 
