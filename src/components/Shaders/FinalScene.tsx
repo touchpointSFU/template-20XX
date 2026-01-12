@@ -95,7 +95,7 @@ export function FinalScene({ texture }: { texture: any }) {
         vertex: postVert,
         fragment: postFrag,
         uniforms: {
-          uResolution: { value: [size.width, size.height] },
+          uResolution: { value: [gl.canvas.width, gl.canvas.height] },
           uTexture: { value: texture },
           uTargetColor: { value: hexToFloatArray(testUniforms.targetColor) },
           uSecondColor: { value: hexToFloatArray(testUniforms.secondColor) },
@@ -109,7 +109,7 @@ export function FinalScene({ texture }: { texture: any }) {
     console.log("resize detected");
     console.log(size, gl);
     const newInfo = gl.canvas.getBoundingClientRect();
-    program.uniforms.uResolution.value = [newInfo.width, newInfo.height];
+    program.uniforms.uResolution.value = [gl.canvas.width, gl.canvas.height];
   };
   useLayoutEffect(() => {
     window.addEventListener("resize", updateBounds);

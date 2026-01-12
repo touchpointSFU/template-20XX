@@ -331,11 +331,11 @@ vec3 cellVal(float uvGray, vec2 cellUV, vec3 uTargetColor, vec3 uSecondColor, ve
 void main() {
   
   vec2 uv = vUv;
-  vec2 pix = gl_FragCoord.xy / 2.0;
+  vec2 pix = gl_FragCoord.xy;
   vec2 pixelmap = fract(pix / pixelSize);
   // vec2 grouping = mod(floor(pix / pixelSize), 2.0);
   vec3 col = texture2D(uTexture, floor(pix / pixelSize) * pixelSize / uResolution.xy).rgb;
-
+//  vec3 tex = col;
   vec3 final = cellVal(col.r, pixelmap, uTargetColor, uSecondColor, uThirdColor);
   // vec3 uTargetColor = vec3(0.827, 1.0, 0.490);
   // vec3 uSecondColor = vec3(1.0, 0.224, 0.882);
@@ -346,7 +346,7 @@ void main() {
   // vec3 col = texture2D(uTexture, roundedUV).rgb;
   // vec3 grid = vec3(fract(uv * 40.0 * ratio), 0.0);
   // vec3 col = texture2D(uTexture, floor(pix / 16.0) * 16.0 / uResolution.xy).rgb;
-  // gl_FragColor = vec4(tex, 1.0);
+  gl_FragColor = vec4(final, 1.0);
 
-  gl_FragColor = vec4(final.r == 0. && final.g == 0. && final.b == 0. ? uBackground : final, 1.0);
+//   gl_FragColor = vec4(final.r == 0. && final.g == 0. && final.b == 0. ? uBackground : final, 1.0);
 }
