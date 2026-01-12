@@ -44,7 +44,7 @@ void main() {
     vec3 targetColor = vec3(0.827, 1.0, 0.490);
 
     //Get the gray value for noise based on current XY
-    float d3 = snoise(vec3(uv, uTime / 2.0));
+    float d3 = snoise(vec3(uv, uTime / 10.0));
 
     vec2 cellUV = fract(uv * 8.);
     
